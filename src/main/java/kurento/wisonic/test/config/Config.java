@@ -1,7 +1,8 @@
-package kurento.wisonic.test.jfcfg;
+package kurento.wisonic.test.config;
 
 import com.jfinal.config.*;
 import com.jfinal.template.Engine;
+import kurento.wisonic.test.controller.HelloWorld;
 
 /**
  * @author 木数难数
@@ -15,7 +16,7 @@ public class Config extends JFinalConfig{
 
     @Override
     public void configRoute(Routes routes) {
-        
+        routes.add("/hello_world", HelloWorld.class, "");
     }
 
     @Override

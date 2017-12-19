@@ -9,8 +9,11 @@
         <module name="kurento-jfinal" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="kurento-jfinal" target="1.5" />
+    <bytecodeTargetLevel target="1.8">
+      <module name="kurento-jfinal" target="1.7" />
     </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="PREFER_TARGET_JDK_COMPILER" value="false" />
   </component>
 </project>
