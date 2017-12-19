@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="kurento-jfinal:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="kurento-jfinal.war">
+      <element id="artifact" artifact-name="kurento-jfinal:war exploded" />
+    </root>
+  </artifact>
+</component>
