@@ -21,9 +21,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @ServerEndpoint(value = "/websocket")
 public class HelloWorldWebSocket {
+
     private static final Gson GSON = new GsonBuilder().create();
     private final Logger log = LoggerFactory.getLogger(HelloWorldWebSocket.class);
-    private int i = 0, j = 0;
 
     private KurentoClient kurento = KurentoClient.create("ws://192.168.1.180:8888/kurento");
 
@@ -35,8 +35,6 @@ public class HelloWorldWebSocket {
         JsonObject jsonMessage = GSON.fromJson(message, JsonObject.class);
 
         log.debug("Incoming message: {}", jsonMessage);
-        i++;
-        System.out.println("handleTextMessage ===============================" + jsonMessage.get("id").getAsString() + "_+_+_+_" + i);
         switch (jsonMessage.get("id").getAsString()) {
             case "start":
                 start(session, jsonMessage);
@@ -49,8 +47,6 @@ public class HelloWorldWebSocket {
                 break;
             }
             case "onIceCandidate": {
-                System.out.println("==============" + jsonMessage);
-
                 JsonObject jsonCandidate = jsonMessage.get("candidate").getAsJsonObject();
 
                 UserSession user = users.get(session.getId());
@@ -74,7 +70,6 @@ public class HelloWorldWebSocket {
             MediaPipeline pipeline = kurento.createMediaPipeline();
             WebRtcEndpoint webRtcEndpoint = new WebRtcEndpoint.Builder(pipeline).build();
             webRtcEndpoint.connect(webRtcEndpoint);
-            System.out.println("start+++++++++++++++++++++++++++++_-----------------------");
             // 2. Store user session
             UserSession user = new UserSession();
             user.setMediaPipeline(pipeline);
@@ -103,8 +98,6 @@ public class HelloWorldWebSocket {
                     response.add("candidate", JsonUtils.toJsonObject(event.getCandidate()));
                     try {
                         synchronized (session) {
-                            j++;
-                            System.out.println(response.toString() + "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-" + "_________" + j);
                             session.getBasicRemote().sendText(response.toString());
                         }
                     } catch (IOException e) {
