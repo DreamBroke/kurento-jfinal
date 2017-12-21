@@ -46,7 +46,7 @@ ws.onmessage = function(message) {
 		startResponse(parsedMessage);
 		break;
 	case 'error':
-		if (state == I_AM_STARTING) {
+		if (state === I_AM_STARTING) {
 			setState(I_CAN_START);
 		}
 		onError('Error message from server: ' + parsedMessage.message);
@@ -58,7 +58,7 @@ ws.onmessage = function(message) {
 		});
 		break;
 	default:
-		if (state == I_AM_STARTING) {
+		if (state === I_AM_STARTING) {
 			setState(I_CAN_START);
 		}
 		onError('Unrecognized message', parsedMessage);
@@ -145,25 +145,27 @@ function destroy() {
 
 function setState(nextState) {
     $("#destroy").attr('onclick', 'destroy()');
+	var start = $('#start');
+	var stop = $('#stop');
 	switch (nextState) {
 	case I_CAN_START:
-		$('#start').attr('disabled', false);
-		$('#start').attr('onclick', 'start()');
-		$('#stop').attr('disabled', true);
-		$('#stop').removeAttr('onclick');
+        start.attr('disabled', false);
+        start.attr('onclick', 'start()');
+        stop.attr('disabled', true);
+        stop.removeAttr('onclick');
 		break;
 
 	case I_CAN_STOP:
-		$('#start').attr('disabled', true);
-		$('#stop').attr('disabled', false);
-		$('#stop').attr('onclick', 'stop()');
+        start.attr('disabled', true);
+        stop.attr('disabled', false);
+        stop.attr('onclick', 'stop()');
 		break;
 
 	case I_AM_STARTING:
-		$('#start').attr('disabled', true);
-		$('#start').removeAttr('onclick');
-		$('#stop').attr('disabled', true);
-		$('#stop').removeAttr('onclick');
+        start.attr('disabled', true);
+        start.removeAttr('onclick');
+        stop.attr('disabled', true);
+        stop.removeAttr('onclick');
 		break;
 
 	default:

@@ -52,5 +52,6 @@
     <orderEntry type="library" name="Maven: org.kurento:kms-api-elements:6.6.0" level="project" />
     <orderEntry type="library" name="Maven: org.kurento:kms-api-filters:6.6.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.websocket:javax.websocket-api:1.1" level="project" />
+    <orderEntry type="library" name="JQuery" level="project" />
   </component>
 </module>

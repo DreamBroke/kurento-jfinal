@@ -3,11 +3,10 @@ package kurento.wisonic.test.websocket;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import kurento.wisonic.test.base.BaseWebSocket;
 import kurento.wisonic.test.model.UserSession;
 import org.kurento.client.*;
 import org.kurento.jsonrpc.JsonUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.websocket.OnMessage;
 import javax.websocket.Session;
@@ -20,15 +19,13 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 
 @ServerEndpoint(value = "/websocket")
-public class HelloWorldWebSocket {
+public class HelloWorldWebSocket extends BaseWebSocket {
 
     private static final Gson GSON = new GsonBuilder().create();
-    private final Logger log = LoggerFactory.getLogger(HelloWorldWebSocket.class);
-
-    private KurentoClient kurento = KurentoClient.create("ws://192.168.1.180:8888/kurento");
 
     private final ConcurrentHashMap<String, UserSession> users = new ConcurrentHashMap<>();
 
+    @Override
     @OnMessage
     public void onMessage(String message, Session session) {
         System.out.println(message);

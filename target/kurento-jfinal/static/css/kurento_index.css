@@ -36,15 +36,15 @@ div.democonsole ul li > * {
 }
 
 div.democonsole ul li.info:before {
-    content: 'â„¹';
+    content: 'i';
 }
 
 div.democonsole ul li.error:before {
-    content: 'â˜ ';
+    content: 'x';
 }
 
 div.democonsole ul li.warn:before {
-    content: 'âš ';
+    content: '!';
 }
 
 span[data-type=""] {

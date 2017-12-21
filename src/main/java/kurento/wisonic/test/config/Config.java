@@ -3,6 +3,7 @@ package kurento.wisonic.test.config;
 import com.jfinal.config.*;
 import com.jfinal.template.Engine;
 import kurento.wisonic.test.controller.HelloWorld;
+import kurento.wisonic.test.controller.One2Many;
 
 /**
  * @author 木数难数
@@ -16,7 +17,8 @@ public class Config extends JFinalConfig{
 
     @Override
     public void configRoute(Routes routes) {
-        routes.add("/hello_world", HelloWorld.class, "");
+        routes.add("/hello_world", HelloWorld.class);
+        routes.add("/one2many", One2Many.class);
     }
 
     @Override
