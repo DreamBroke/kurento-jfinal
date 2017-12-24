@@ -29,13 +29,13 @@ import org.kurento.client.WebRtcEndpoint;
  * @author Micael Gallego (micael.gallego@gmail.com)
  * @since 4.3.1
  */
-public class CallMediaPipeline {
+public class CallMediaPipelineOne2One {
 
     private MediaPipeline pipeline;
     private WebRtcEndpoint callerWebRtcEp;
     private WebRtcEndpoint calleeWebRtcEp;
 
-    public CallMediaPipeline(KurentoClient kurento) {
+    public CallMediaPipelineOne2One(KurentoClient kurento) {
         try {
             this.pipeline = kurento.createMediaPipeline();
             this.callerWebRtcEp = new WebRtcEndpoint.Builder(pipeline).build();

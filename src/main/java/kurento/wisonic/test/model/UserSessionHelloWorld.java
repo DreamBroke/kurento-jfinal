@@ -7,11 +7,11 @@ import org.kurento.client.WebRtcEndpoint;
 /**
  * @author 木数难数
  */
-public class UserSession {
+public class UserSessionHelloWorld {
     private WebRtcEndpoint webRtcEndpoint;
     private MediaPipeline mediaPipeline;
 
-    public UserSession() {
+    public UserSessionHelloWorld() {
     }
 
     public WebRtcEndpoint getWebRtcEndpoint() {

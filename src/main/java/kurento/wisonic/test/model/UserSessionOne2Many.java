@@ -13,7 +13,7 @@ import java.io.IOException;
  * @author 木数难数
  */
 public class UserSessionOne2Many {
-    private static final Logger log = LoggerFactory.getLogger(UserSession.class);
+    private static final Logger log = LoggerFactory.getLogger(UserSessionOne2Many.class);
 
     private final Session session;
     private WebRtcEndpoint webRtcEndpoint;

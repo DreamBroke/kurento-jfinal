@@ -2,12 +2,10 @@ package kurento.wisonic.test.websocket;
 
 import com.google.gson.JsonObject;
 import kurento.wisonic.test.base.BaseWebSocket;
-import kurento.wisonic.test.model.CallMediaPipeline;
-import kurento.wisonic.test.model.UserRegistry;
+import kurento.wisonic.test.model.CallMediaPipelineOne2One;
+import kurento.wisonic.test.model.UserRegistryOne2One;
 import kurento.wisonic.test.model.UserSessionOne2One;
-import org.kurento.client.EventListener;
 import org.kurento.client.IceCandidate;
-import org.kurento.client.IceCandidateFoundEvent;
 import org.kurento.jsonrpc.JsonUtils;
 
 import javax.websocket.OnClose;
@@ -23,9 +21,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @ServerEndpoint(value = "/one2one_websocket")
 public class One2OneWebSocket extends BaseWebSocket {
 
-    private final ConcurrentHashMap<String, CallMediaPipeline> pipelines = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, CallMediaPipelineOne2One> pipelines = new ConcurrentHashMap<>();
 
-    private static UserRegistry registry = new UserRegistry();
+    private static UserRegistryOne2One registry = new UserRegistryOne2One();
 
     @Override
     @OnMessage
@@ -127,9 +125,9 @@ public class One2OneWebSocket extends BaseWebSocket {
         if ("accept".equals(callResponse)) {
             log.debug("Accepted call from '{}' to '{}'", from, to);
 
-            CallMediaPipeline pipeline = null;
+            CallMediaPipelineOne2One pipeline = null;
             try {
-                pipeline = new CallMediaPipeline(kurento);
+                pipeline = new CallMediaPipelineOne2One(kurento);
                 pipelines.put(calleer.getSessionId(), pipeline);
                 pipelines.put(callee.getSessionId(), pipeline);
 
@@ -221,7 +219,7 @@ public class One2OneWebSocket extends BaseWebSocket {
         String sessionId = session.getId();
         if (pipelines.containsKey(sessionId)) {
             pipelines.get(sessionId).release();
-            CallMediaPipeline pipeline = pipelines.remove(sessionId);
+            CallMediaPipelineOne2One pipeline = pipelines.remove(sessionId);
             pipeline.release();
 
             // Both users can stop the communication. A 'stopCommunication'

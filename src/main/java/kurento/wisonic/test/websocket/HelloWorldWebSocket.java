@@ -1,10 +1,8 @@
 package kurento.wisonic.test.websocket;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import kurento.wisonic.test.base.BaseWebSocket;
-import kurento.wisonic.test.model.UserSession;
+import kurento.wisonic.test.model.UserSessionHelloWorld;
 import org.kurento.client.*;
 import org.kurento.jsonrpc.JsonUtils;
 
@@ -21,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @ServerEndpoint(value = "/websocket")
 public class HelloWorldWebSocket extends BaseWebSocket {
 
-    private final ConcurrentHashMap<String, UserSession> users = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, UserSessionHelloWorld> users = new ConcurrentHashMap<>();
 
     @Override
     @OnMessage
@@ -35,7 +33,7 @@ public class HelloWorldWebSocket extends BaseWebSocket {
                 start(session, jsonMessage);
                 break;
             case "stop": {
-                UserSession user = users.remove(session.getId());
+                UserSessionHelloWorld user = users.remove(session.getId());
                 if (user != null) {
                     user.release();
                 }
@@ -44,7 +42,7 @@ public class HelloWorldWebSocket extends BaseWebSocket {
             case "onIceCandidate": {
                 JsonObject jsonCandidate = jsonMessage.get("candidate").getAsJsonObject();
 
-                UserSession user = users.get(session.getId());
+                UserSessionHelloWorld user = users.get(session.getId());
                 if (user != null) {
                     IceCandidate candidate = new IceCandidate(jsonCandidate.get("candidate").getAsString(),
                             jsonCandidate.get("sdpMid").getAsString(),
@@ -71,7 +69,7 @@ public class HelloWorldWebSocket extends BaseWebSocket {
             WebRtcEndpoint webRtcEndpoint = new WebRtcEndpoint.Builder(pipeline).build();
             webRtcEndpoint.connect(webRtcEndpoint);
             // 2. Store user session
-            UserSession user = new UserSession();
+            UserSessionHelloWorld user = new UserSessionHelloWorld();
             user.setMediaPipeline(pipeline);
             user.setWebRtcEndpoint(webRtcEndpoint);
             users.put(session.getId(), user);

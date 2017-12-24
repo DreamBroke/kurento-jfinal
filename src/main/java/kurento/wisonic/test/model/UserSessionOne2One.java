@@ -36,7 +36,7 @@ import java.util.List;
  */
 public class UserSessionOne2One {
 
-  private static final Logger log = LoggerFactory.getLogger(UserSession.class);
+  private static final Logger log = LoggerFactory.getLogger(UserSessionOne2One.class);
 
   private final String name;
   private final Session session;

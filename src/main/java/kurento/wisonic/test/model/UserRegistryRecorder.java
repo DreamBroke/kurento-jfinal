@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2014 Kurento (http://kurento.org/)
+ * (C) Copyright 2014-2016 Kurento (http://kurento.org/)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-
 package kurento.wisonic.test.model;
 
 import javax.websocket.Session;
@@ -26,34 +25,31 @@ import java.util.concurrent.ConcurrentHashMap;
  * 
  * @author Boni Garcia (bgarcia@gsyc.es)
  * @author Micael Gallego (micael.gallego@gmail.com)
- * @since 4.3.1
+ * @since 5.0.0
  */
-public class UserRegistry {
+public class UserRegistryRecorder {
 
-  private ConcurrentHashMap<String, UserSessionOne2One> usersByName = new ConcurrentHashMap<>();
-  private ConcurrentHashMap<String, UserSessionOne2One> usersBySessionId = new ConcurrentHashMap<>();
+  private ConcurrentHashMap<String, UserSessionRecorder> usersBySessionId = new ConcurrentHashMap<>();
 
-  public void register(UserSessionOne2One user) {
-    usersByName.put(user.getName(), user);
-    usersBySessionId.put(user.getSession().getId(), user);
+  public void register(UserSessionRecorder user) {
+    usersBySessionId.put(user.getId(), user);
   }
 
-  public UserSessionOne2One getByName(String name) {
-    return usersByName.get(name);
+  public UserSessionRecorder getById(String id) {
+    return usersBySessionId.get(id);
   }
 
-  public UserSessionOne2One getBySession(Session session) {
+  public UserSessionRecorder getBySession(Session session) {
     return usersBySessionId.get(session.getId());
   }
 
-  public boolean exists(String name) {
-    return usersByName.keySet().contains(name);
+  public boolean exists(String id) {
+    return usersBySessionId.keySet().contains(id);
   }
 
-  public UserSessionOne2One removeBySession(Session session) {
-    final UserSessionOne2One user = getBySession(session);
+  public UserSessionRecorder removeBySession(Session session) {
+    final UserSessionRecorder user = getBySession(session);
     if (user != null) {
-      usersByName.remove(user.getName());
       usersBySessionId.remove(session.getId());
     }
     return user;
