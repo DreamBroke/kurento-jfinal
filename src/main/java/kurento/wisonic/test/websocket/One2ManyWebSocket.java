@@ -1,7 +1,5 @@
 package kurento.wisonic.test.websocket;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import kurento.wisonic.test.base.BaseWebSocket;
 import kurento.wisonic.test.model.UserSessionOne2Many;
@@ -21,12 +19,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @ServerEndpoint(value = "/one2many_websocket")
 public class One2ManyWebSocket extends BaseWebSocket {
 
-    private static final Gson GSON = new GsonBuilder().create();
-
     private final ConcurrentHashMap<String, UserSessionOne2Many> viewers = new ConcurrentHashMap<>();
 
-    private MediaPipeline pipeline;
-    private UserSessionOne2Many presenterUserSession;
+    private static MediaPipeline pipeline;
+    private static UserSessionOne2Many presenterUserSession;
 
     @Override
     @OnMessage
@@ -74,20 +70,8 @@ public class One2ManyWebSocket extends BaseWebSocket {
         }
     }
 
-    private void handleErrorResponse(Throwable throwable, Session session, String responseId)
-            throws IOException {
-        stop(session);
-        log.error(throwable.getMessage(), throwable);
-        JsonObject response = new JsonObject();
-        response.addProperty("id", responseId);
-        response.addProperty("response", "rejected");
-        response.addProperty("message", throwable.getMessage());
-        session.getBasicRemote().sendText(response.toString());
-    }
-
     private synchronized void presenter(final Session session, JsonObject jsonMessage)
             throws IOException {
-        System.out.println(presenterUserSession == null);
         if (presenterUserSession == null) {
             presenterUserSession = new UserSessionOne2Many(session);
 
@@ -96,22 +80,7 @@ public class One2ManyWebSocket extends BaseWebSocket {
 
             WebRtcEndpoint presenterWebRtc = presenterUserSession.getWebRtcEndpoint();
 
-            presenterWebRtc.addIceCandidateFoundListener(new EventListener<IceCandidateFoundEvent>() {
-
-                @Override
-                public void onEvent(IceCandidateFoundEvent event) {
-                    JsonObject response = new JsonObject();
-                    response.addProperty("id", "iceCandidate");
-                    response.add("candidate", JsonUtils.toJsonObject(event.getCandidate()));
-                    try {
-                        synchronized (session) {
-                            session.getBasicRemote().sendText(response.toString());
-                        }
-                    } catch (IOException e) {
-                        log.debug(e.getMessage());
-                    }
-                }
-            });
+            presenterWebRtc.addIceCandidateFoundListener(getListener(session));
 
             String sdpOffer = jsonMessage.getAsJsonPrimitive("sdpOffer").getAsString();
             String sdpAnswer = presenterWebRtc.processOffer(sdpOffer);
@@ -146,6 +115,7 @@ public class One2ManyWebSocket extends BaseWebSocket {
                     "No active sender now. Become sender or . Try again later ...");
             session.getBasicRemote().sendText(response.toString());
         } else {
+            System.out.println(session.getId() + "===============================");
             if (viewers.containsKey(session.getId())) {
                 JsonObject response = new JsonObject();
                 response.addProperty("id", "viewerResponse");
@@ -160,22 +130,7 @@ public class One2ManyWebSocket extends BaseWebSocket {
 
             WebRtcEndpoint nextWebRtc = new WebRtcEndpoint.Builder(pipeline).build();
 
-            nextWebRtc.addIceCandidateFoundListener(new EventListener<IceCandidateFoundEvent>() {
-
-                @Override
-                public void onEvent(IceCandidateFoundEvent event) {
-                    JsonObject response = new JsonObject();
-                    response.addProperty("id", "iceCandidate");
-                    response.add("candidate", JsonUtils.toJsonObject(event.getCandidate()));
-                    try {
-                        synchronized (session) {
-                            session.getBasicRemote().sendText(response.toString());
-                        }
-                    } catch (IOException e) {
-                        log.debug(e.getMessage());
-                    }
-                }
-            });
+            nextWebRtc.addIceCandidateFoundListener(getListener(session));
 
             viewer.setWebRtcEndpoint(nextWebRtc);
             presenterUserSession.getWebRtcEndpoint().connect(nextWebRtc);
@@ -194,7 +149,23 @@ public class One2ManyWebSocket extends BaseWebSocket {
         }
     }
 
-    private synchronized void stop(Session session) throws IOException {
+    private EventListener<IceCandidateFoundEvent> getListener(final Session session) {
+        return event -> {
+            JsonObject response = new JsonObject();
+            response.addProperty("id", "iceCandidate");
+            response.add("candidate", JsonUtils.toJsonObject(event.getCandidate()));
+            try {
+                synchronized (session) {
+                    session.getBasicRemote().sendText(response.toString());
+                }
+            } catch (IOException e) {
+                log.debug(e.getMessage());
+            }
+        };
+    }
+
+    @Override
+    protected synchronized void stop(Session session) throws IOException {
         String sessionId = session.getId();
         if (presenterUserSession != null && presenterUserSession.getSession().getId().equals(sessionId)) {
             for (UserSessionOne2Many viewer : viewers.values()) {

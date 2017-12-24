@@ -4,6 +4,7 @@ import com.jfinal.config.*;
 import com.jfinal.template.Engine;
 import kurento.wisonic.test.controller.HelloWorld;
 import kurento.wisonic.test.controller.One2Many;
+import kurento.wisonic.test.controller.One2One;
 
 /**
  * @author 木数难数
@@ -19,6 +20,7 @@ public class Config extends JFinalConfig{
     public void configRoute(Routes routes) {
         routes.add("/hello_world", HelloWorld.class);
         routes.add("/one2many", One2Many.class);
+        routes.add("/one2one", One2One.class);
     }
 
     @Override

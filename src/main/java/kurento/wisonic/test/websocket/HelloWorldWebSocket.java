@@ -21,8 +21,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @ServerEndpoint(value = "/websocket")
 public class HelloWorldWebSocket extends BaseWebSocket {
 
-    private static final Gson GSON = new GsonBuilder().create();
-
     private final ConcurrentHashMap<String, UserSession> users = new ConcurrentHashMap<>();
 
     @Override
@@ -59,6 +57,11 @@ public class HelloWorldWebSocket extends BaseWebSocket {
                 sendError(session, "Invalid message with id " + jsonMessage.get("id").getAsString());
                 break;
         }
+    }
+
+    @Override
+    protected void stop(Session session) throws IOException {
+
     }
 
     private void start(final Session session, JsonObject jsonMessage) {

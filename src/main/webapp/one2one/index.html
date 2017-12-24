@@ -11,17 +11,18 @@
 <link href="https://cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.bootcss.com/ekko-lightbox/5.2.0/ekko-lightbox.min.css" rel="stylesheet">
 <link rel="stylesheet" href="../static/css/kurento_index.css">
-<link rel="stylesheet" href="../static/css/one2many.css">
+<link rel="stylesheet" href="../static/css/one2one.css">
 
 <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script src="https://cdn.bootcss.com/ekko-lightbox/5.2.0/ekko-lightbox.min.js"></script>
+<script src="https://cdn.bootcss.com/draggabilly/2.1.1/draggabilly.pkgd.min.js"></script>
 <script src="https://cdn.bootcss.com/webrtc-adapter/zv4.1.1/adapter.js"></script>
 <script src="../static/js/kurento_index1.js"></script>
 
 <script src="../static/js/kurento-utils.js"></script>
-<script src="../static/js/one2many.js"></script>
-<title>Kurento Tutorial 3: Video Call 1 to N with WebRTC</title>
+<script src="../static/js/one2one.js"></script>
+<title>Kurento Tutorial 4: Video Call 1 to 1 with WebRTC</title>
 </head>
 <body>
 	<header>
@@ -36,7 +37,7 @@
 					id="bs-example-navbar-collapse-1">
 					<ul class="nav navbar-nav navbar-right">
 						<li><a
-							href="https://github.com/Kurento/kurento-tutorial-java/tree/master/kurento-one2many-call"><span
+							href="https://github.com/Kurento/kurento-tutorial-java/tree/master/kurento-one2one-call"><span
 								class="glyphicon glyphicon-file"></span> Source Code</a></li>
 					</ul>
 				</div>
@@ -45,48 +46,60 @@
 	</header>
 	<div class="container">
 		<div class="page-header">
-			<h1>Tutorial 3: Video Call 1 to N with WebRTC</h1>
+			<h1>Tutorial 4: Video Call 1 to 1 with WebRTC</h1>
 			<p>
-				This web application consists on an one to many video call using <a
-					href="http://www.webrtc.org/">WebRTC</a>. In other words, this is
-				an implementation of a video broadcasting application. There are two
-				types of users in this application: 1 peer sending media (let's call
-				it <i>Presenter</i>) and N peers receiving the media of the <i>Presenter</i>
-				(let's call them <i>Viewers</i>). Thus, the <a
+				This web application consists on an one to one video call using <a
+					href="http://www.webrtc.org/">WebRTC</a>. In other words, this
+				application is similar to a phone but also with video. The <a
 					href="../static/img/pipeline.png" data-toggle="lightbox"
-					data-title="Video Call 1 to N Media Pipeline"
-					data-footer="1 WebRtcEnpoint (Presenter) is set in SendOnly mode, and its stream is sent to N WebRtcEnpoints (Viewers), whics are set in RecvOnly mode.">Media
-					Pipeline</a> is composed by 1+N interconnected <i>WebRtcEndpoints</i>.
+					data-title="Video Call 1 to 1 Media Pipeline"
+					data-footer="Two interconnected WebRtcEnpoints Media Elements">Media
+					Pipeline</a> is composed by two interconnected <i>WebRtcEndpoints</i>.
 				To run this demo follow these steps:
 			</p>
 			<ol>
 				<li>Open this page with a browser compliant with WebRTC
 					(Chrome, Firefox).</li>
-				<li>If you would like to be the <i>Presenter</i> of the
-					communication, click on <i>Presenter</i> button. There can only be
-					one of this kind of peer, and so, if the <i>Presenter</i> peer is
-					already present, the application returns an error (see the the
-					console).
+				<li>Type a nick in the field <i>Name</i> and click on <i>Register</i>.
 				</li>
-				<li>Grant the access to the camera and microphone. After the
-					SDP negotiation the communication should start.</li>
 				<li>In a different machine (or a different tab in the same
-					browser) click on <i>Viewer</i> button to see the <i>Presenter</i>
-					stream.
+					browser) follow the same procedure to register another user.</li>
+				<li>Type the name of the user to be called in the field <i>Peer</i>
+					and click <i>Call</i>.
 				</li>
-				<li>Click on <i>Stop</i> to finish the communication. When <i>Presenter</i>
-					clicks on <i>Stop</i>, the rest of <i>Viewers</i> (if any) ends the
-					communication too.
+				<li>Grant the access to the camera and microphone for both
+					users. After the SDP negotiation the communication should start.</li>
+				<li>The called user should accept the incoming call (by a
+					confirmation dialog).</li>
+				<li>Click on <i>Stop</i> to finish the communication.
 				</li>
 			</ol>
 		</div>
 		<div class="row">
 			<div class="col-md-5">
+				<label class="control-label" for="name">Name</label>
 				<div class="row">
-					<div class="col-md-12">
-						<a id="presenter" href="#" class="btn btn-success"><span class="glyphicon glyphicon-play"></span> Presenter </a>
-						<a id="viewer" href="#" class="btn btn-primary"><span class="glyphicon glyphicon-user"></span> Viewer</a>
-						<a id="stop" href="#" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span> Stop</a>
+					<div class="col-md-6">
+						<input id="name" name="name" class="form-control" type="text"
+							onkeydown="if (event.keyCode === 13) register();" />
+					</div>
+					<div class="col-md-6 text-right">
+						<a id="register" href="#" class="btn btn-primary"><span
+							class="glyphicon glyphicon-plus"></span> Register</a>
+					</div>
+				</div>
+
+				<br /> <br /> <label class="control-label" for="peer">Peer</label>
+				<div class="row">
+					<div class="col-md-6">
+						<input id="peer" name="peer" class="form-control" type="text"
+							onkeydown="if (event.keyCode === 13) call();">
+					</div>
+					<div class="col-md-6 text-right">
+						<a id="call" href="#" class="btn btn-success"><span
+							class="glyphicon glyphicon-play"></span> Call</a> <a id="terminate"
+							href="#" class="btn btn-danger"><span
+							class="glyphicon glyphicon-stop"></span> Stop</a>
 					</div>
 				</div>
 				<br /> <label class="control-label" for="console">Console</label><br>
@@ -97,7 +110,11 @@
 			</div>
 			<div class="col-md-7">
 				<div id="videoBig">
-					<video id="video" autoplay width="640px" height="480px"
+					<video id="videoOutput" autoplay width="640px" height="480px"
+						poster="../static/img/webrtc.png"></video>
+				</div>
+				<div id="videoSmall">
+					<video id="videoInput" autoplay width="240px" height="180px"
 						poster="../static/img/webrtc.png"></video>
 				</div>
 			</div>
