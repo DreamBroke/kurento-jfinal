@@ -119,8 +119,8 @@ public class One2OneWebSocket extends BaseWebSocket {
             throws IOException {
         String callResponse = jsonMessage.get("callResponse").getAsString();
         String from = jsonMessage.get("from").getAsString();
-        final UserSessionOne2One calleer = registry.getByName(from);
-        String to = calleer.getCallingTo();
+        final UserSessionOne2One caller = registry.getByName(from);
+        String to = caller.getCallingTo();
 
         if ("accept".equals(callResponse)) {
             log.debug("Accepted call from '{}' to '{}'", from, to);
@@ -128,7 +128,7 @@ public class One2OneWebSocket extends BaseWebSocket {
             CallMediaPipelineOne2One pipeline = null;
             try {
                 pipeline = new CallMediaPipelineOne2One(kurento);
-                pipelines.put(calleer.getSessionId(), pipeline);
+                pipelines.put(caller.getSessionId(), pipeline);
                 pipelines.put(callee.getSessionId(), pipeline);
 
                 callee.setWebRtcEndpoint(pipeline.getCalleeWebRtcEp());
@@ -146,15 +146,15 @@ public class One2OneWebSocket extends BaseWebSocket {
                             }
                         });
 
-                calleer.setWebRtcEndpoint(pipeline.getCallerWebRtcEp());
+                caller.setWebRtcEndpoint(pipeline.getCallerWebRtcEp());
                 pipeline.getCallerWebRtcEp().addIceCandidateFoundListener(
                         event -> {
                             JsonObject response = new JsonObject();
                             response.addProperty("id", "iceCandidate");
                             response.add("candidate", JsonUtils.toJsonObject(event.getCandidate()));
                             try {
-                                synchronized (calleer.getSession()) {
-                                    calleer.getSession().getBasicRemote().sendText(response.toString());
+                                synchronized (caller.getSession()) {
+                                    caller.getSession().getBasicRemote().sendText(response.toString());
                                 }
                             } catch (IOException e) {
                                 log.debug(e.getMessage());
@@ -180,8 +180,8 @@ public class One2OneWebSocket extends BaseWebSocket {
                 response.addProperty("response", "accepted");
                 response.addProperty("sdpAnswer", callerSdpAnswer);
 
-                synchronized (calleer) {
-                    calleer.sendMessage(response);
+                synchronized (caller) {
+                    caller.sendMessage(response);
                 }
 
                 pipeline.getCallerWebRtcEp().gatherCandidates();
@@ -193,13 +193,13 @@ public class One2OneWebSocket extends BaseWebSocket {
                     pipeline.release();
                 }
 
-                pipelines.remove(calleer.getSessionId());
+                pipelines.remove(caller.getSessionId());
                 pipelines.remove(callee.getSessionId());
 
                 JsonObject response = new JsonObject();
                 response.addProperty("id", "callResponse");
                 response.addProperty("response", "rejected");
-                calleer.sendMessage(response);
+                caller.sendMessage(response);
 
                 response = new JsonObject();
                 response.addProperty("id", "stopCommunication");
@@ -210,7 +210,7 @@ public class One2OneWebSocket extends BaseWebSocket {
             JsonObject response = new JsonObject();
             response.addProperty("id", "callResponse");
             response.addProperty("response", "rejected");
-            calleer.sendMessage(response);
+            caller.sendMessage(response);
         }
     }
 
