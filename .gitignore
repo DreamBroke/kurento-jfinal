@@ -2,3 +2,4 @@
 *.iml
 /.idea/
 *.class
+src/main/java/kurento/wisonic/test/test/TestClass.java

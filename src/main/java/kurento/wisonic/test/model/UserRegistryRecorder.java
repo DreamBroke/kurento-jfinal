@@ -22,37 +22,37 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Map of users registered in the system. This class has a concurrent hash map to store users, using
  * its name as key in the map.
- * 
+ *
  * @author Boni Garcia (bgarcia@gsyc.es)
  * @author Micael Gallego (micael.gallego@gmail.com)
  * @since 5.0.0
  */
 public class UserRegistryRecorder {
 
-  private ConcurrentHashMap<String, UserSessionRecorder> usersBySessionId = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, UserSessionRecorder> usersBySessionId = new ConcurrentHashMap<>();
 
-  public void register(UserSessionRecorder user) {
-    usersBySessionId.put(user.getId(), user);
-  }
-
-  public UserSessionRecorder getById(String id) {
-    return usersBySessionId.get(id);
-  }
-
-  public UserSessionRecorder getBySession(Session session) {
-    return usersBySessionId.get(session.getId());
-  }
-
-  public boolean exists(String id) {
-    return usersBySessionId.keySet().contains(id);
-  }
-
-  public UserSessionRecorder removeBySession(Session session) {
-    final UserSessionRecorder user = getBySession(session);
-    if (user != null) {
-      usersBySessionId.remove(session.getId());
+    public void register(UserSessionRecorder user) {
+        usersBySessionId.put(user.getId(), user);
     }
-    return user;
-  }
+
+    public UserSessionRecorder getById(String id) {
+        return usersBySessionId.get(id);
+    }
+
+    public UserSessionRecorder getBySession(Session session) {
+        return usersBySessionId.get(session.getId());
+    }
+
+    public boolean exists(String id) {
+        return usersBySessionId.keySet().contains(id);
+    }
+
+    public UserSessionRecorder removeBySession(Session session) {
+        final UserSessionRecorder user = getBySession(session);
+        if (user != null) {
+            usersBySessionId.remove(session.getId());
+        }
+        return user;
+    }
 
 }

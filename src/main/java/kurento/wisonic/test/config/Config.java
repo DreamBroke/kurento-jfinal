@@ -16,11 +16,12 @@ public class Config extends JFinalConfig{
 
     @Override
     public void configRoute(Routes routes) {
-        routes.add("/hello_world", HelloWorld.class);
+        routes.add("/hello-world", HelloWorld.class);
         routes.add("/one2many", One2Many.class);
         routes.add("/one2one", One2One.class);
         routes.add("/recorder", Recorder.class);
         routes.add("/group", Group.class);
+        routes.add("/screen-sharing", ScreenSharing.class);
     }
 
     @Override

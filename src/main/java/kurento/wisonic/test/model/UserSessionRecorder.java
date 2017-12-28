@@ -34,83 +34,77 @@ import java.util.concurrent.TimeUnit;
  */
 public class UserSessionRecorder {
 
-  private final Logger log = LoggerFactory.getLogger(UserSessionRecorder.class);
+    private final Logger log = LoggerFactory.getLogger(UserSessionRecorder.class);
 
-  private String id;
-  private WebRtcEndpoint webRtcEndpoint;
-  private RecorderEndpoint recorderEndpoint;
-  private MediaPipeline mediaPipeline;
-  private Date stopTimestamp;
+    private String id;
+    private WebRtcEndpoint webRtcEndpoint;
+    private RecorderEndpoint recorderEndpoint;
+    private MediaPipeline mediaPipeline;
+    private Date stopTimestamp;
 
-  public UserSessionRecorder(Session session) {
-    this.id = session.getId();
-  }
+    public UserSessionRecorder(Session session) {
+        this.id = session.getId();
+    }
 
-  public String getId() {
-    return id;
-  }
+    public String getId() {
+        return id;
+    }
 
-  public void setId(String id) {
-    this.id = id;
-  }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-  public WebRtcEndpoint getWebRtcEndpoint() {
-    return webRtcEndpoint;
-  }
+    public WebRtcEndpoint getWebRtcEndpoint() {
+        return webRtcEndpoint;
+    }
 
-  public void setWebRtcEndpoint(WebRtcEndpoint webRtcEndpoint) {
-    this.webRtcEndpoint = webRtcEndpoint;
-  }
+    public void setWebRtcEndpoint(WebRtcEndpoint webRtcEndpoint) {
+        this.webRtcEndpoint = webRtcEndpoint;
+    }
 
-  public void setRecorderEndpoint(RecorderEndpoint recorderEndpoint) {
-    this.recorderEndpoint = recorderEndpoint;
-  }
+    public void setRecorderEndpoint(RecorderEndpoint recorderEndpoint) {
+        this.recorderEndpoint = recorderEndpoint;
+    }
 
-  public MediaPipeline getMediaPipeline() {
-    return mediaPipeline;
-  }
+    public MediaPipeline getMediaPipeline() {
+        return mediaPipeline;
+    }
 
-  public void setMediaPipeline(MediaPipeline mediaPipeline) {
-    this.mediaPipeline = mediaPipeline;
-  }
+    public void setMediaPipeline(MediaPipeline mediaPipeline) {
+        this.mediaPipeline = mediaPipeline;
+    }
 
-  public void addCandidate(IceCandidate candidate) {
-    webRtcEndpoint.addIceCandidate(candidate);
-  }
+    public void addCandidate(IceCandidate candidate) {
+        webRtcEndpoint.addIceCandidate(candidate);
+    }
 
-  public Date getStopTimestamp() {
-    return stopTimestamp;
-  }
+    public Date getStopTimestamp() {
+        return stopTimestamp;
+    }
 
-  public void stop() {
-    if (recorderEndpoint != null) {
-      final CountDownLatch stoppedCountDown = new CountDownLatch(1);
-      ListenerSubscription subscriptionId = recorderEndpoint
-          .addStoppedListener(new EventListener<StoppedEvent>() {
-
-            @Override
-            public void onEvent(StoppedEvent event) {
-              stoppedCountDown.countDown();
+    public void stop() {
+        if (recorderEndpoint != null) {
+            final CountDownLatch stoppedCountDown = new CountDownLatch(1);
+            ListenerSubscription subscriptionId = recorderEndpoint
+                    .addStoppedListener(event -> stoppedCountDown.countDown());
+            recorderEndpoint.stop();
+            try {
+                if (!stoppedCountDown.await(5, TimeUnit.SECONDS)) {
+                    log.error("Error waiting for recorder to stop");
+                }
+            } catch (InterruptedException e) {
+                log.error("Exception while waiting for state change", e);
             }
-          });
-      recorderEndpoint.stop();
-      try {
-        if (!stoppedCountDown.await(5, TimeUnit.SECONDS)) {
-          log.error("Error waiting for recorder to stop");
+            recorderEndpoint.removeStoppedListener(subscriptionId);
         }
-      } catch (InterruptedException e) {
-        log.error("Exception while waiting for state change", e);
-      }
-      recorderEndpoint.removeStoppedListener(subscriptionId);
     }
-  }
 
-  public void release() {
-    this.mediaPipeline.release();
-    this.webRtcEndpoint = null;
-    this.mediaPipeline = null;
-    if (this.stopTimestamp == null) {
-      this.stopTimestamp = new Date();
+    public void release() {
+        this.mediaPipeline.release();
+        this.webRtcEndpoint = null;
+        this.mediaPipeline = null;
+        if (this.stopTimestamp == null) {
+            this.stopTimestamp = new Date();
+        }
     }
-  }
 }

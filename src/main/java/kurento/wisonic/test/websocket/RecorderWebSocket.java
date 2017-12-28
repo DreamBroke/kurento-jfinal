@@ -83,55 +83,40 @@ public class RecorderWebSocket extends BaseWebSocket {
             RecorderEndpoint recorder = new RecorderEndpoint.Builder(pipeline, RECORDER_FILE_PATH)
                     .withMediaProfile(profile).build();
 
-            recorder.addRecordingListener(new EventListener<RecordingEvent>() {
-
-                @Override
-                public void onEvent(RecordingEvent event) {
-                    JsonObject response = new JsonObject();
-                    response.addProperty("id", "recording");
-                    try {
-                        synchronized (session) {
-                            session.getBasicRemote().sendText(response.toString());
-                        }
-                    } catch (IOException e) {
-                        log.error(e.getMessage());
+            recorder.addRecordingListener(event -> {
+                JsonObject response = new JsonObject();
+                response.addProperty("id", "recording");
+                try {
+                    synchronized (session) {
+                        session.getBasicRemote().sendText(response.toString());
                     }
+                } catch (IOException e) {
+                    log.error(e.getMessage());
                 }
-
             });
 
-            recorder.addStoppedListener(new EventListener<StoppedEvent>() {
-
-                @Override
-                public void onEvent(StoppedEvent event) {
-                    JsonObject response = new JsonObject();
-                    response.addProperty("id", "stopped");
-                    try {
-                        synchronized (session) {
-                            session.getBasicRemote().sendText(response.toString());
-                        }
-                    } catch (IOException e) {
-                        log.error(e.getMessage());
+            recorder.addStoppedListener(event -> {
+                JsonObject response = new JsonObject();
+                response.addProperty("id", "stopped");
+                try {
+                    synchronized (session) {
+                        session.getBasicRemote().sendText(response.toString());
                     }
+                } catch (IOException e) {
+                    log.error(e.getMessage());
                 }
-
             });
 
-            recorder.addPausedListener(new EventListener<PausedEvent>() {
-
-                @Override
-                public void onEvent(PausedEvent event) {
-                    JsonObject response = new JsonObject();
-                    response.addProperty("id", "paused");
-                    try {
-                        synchronized (session) {
-                            session.getBasicRemote().sendText(response.toString());
-                        }
-                    } catch (IOException e) {
-                        log.error(e.getMessage());
+            recorder.addPausedListener(event -> {
+                JsonObject response = new JsonObject();
+                response.addProperty("id", "paused");
+                try {
+                    synchronized (session) {
+                        session.getBasicRemote().sendText(response.toString());
                     }
+                } catch (IOException e) {
+                    log.error(e.getMessage());
                 }
-
             });
 
             connectAccordingToProfile(webRtcEndpoint, recorder, profile);
@@ -148,28 +133,13 @@ public class RecorderWebSocket extends BaseWebSocket {
             String sdpAnswer = webRtcEndpoint.processOffer(sdpOffer);
 
             // 4. Gather ICE candidates
-            webRtcEndpoint.addIceCandidateFoundListener(new EventListener<IceCandidateFoundEvent>() {
-
-                @Override
-                public void onEvent(IceCandidateFoundEvent event) {
-                    JsonObject response = new JsonObject();
-                    response.addProperty("id", "iceCandidate");
-                    response.add("candidate", JsonUtils.toJsonObject(event.getCandidate()));
-                    try {
-                        synchronized (session) {
-                            session.getBasicRemote().sendText(response.toString());
-                        }
-                    } catch (IOException e) {
-                        log.error(e.getMessage());
-                    }
-                }
-            });
+            webRtcEndpoint.addIceCandidateFoundListener(getListener(session));
 
             JsonObject response = new JsonObject();
             response.addProperty("id", "startResponse");
             response.addProperty("sdpAnswer", sdpAnswer);
 
-            synchronized (user) {
+            synchronized (session) {
                 session.getBasicRemote().sendText(response.toString());
             }
 
@@ -227,19 +197,13 @@ public class RecorderWebSocket extends BaseWebSocket {
             player.connect(webRtcEndpoint);
 
             // Player listeners
-            player.addErrorListener(new EventListener<ErrorEvent>() {
-                @Override
-                public void onEvent(ErrorEvent event) {
-                    log.info("ErrorEvent for session '{}': {}", session.getId(), event.getDescription());
-                    sendPlayEnd(session, pipeline);
-                }
+            player.addErrorListener(event -> {
+                log.info("ErrorEvent for session '{}': {}", session.getId(), event.getDescription());
+                sendPlayEnd(session, pipeline);
             });
-            player.addEndOfStreamListener(new EventListener<EndOfStreamEvent>() {
-                @Override
-                public void onEvent(EndOfStreamEvent event) {
-                    log.info("EndOfStreamEvent for session '{}'", session.getId());
-                    sendPlayEnd(session, pipeline);
-                }
+            player.addEndOfStreamListener(event -> {
+                log.info("EndOfStreamEvent for session '{}'", session.getId());
+                sendPlayEnd(session, pipeline);
             });
 
             // 2. Store user session
@@ -255,22 +219,7 @@ public class RecorderWebSocket extends BaseWebSocket {
             response.addProperty("sdpAnswer", sdpAnswer);
 
             // 4. Gather ICE candidates
-            webRtcEndpoint.addIceCandidateFoundListener(new EventListener<IceCandidateFoundEvent>() {
-
-                @Override
-                public void onEvent(IceCandidateFoundEvent event) {
-                    JsonObject response = new JsonObject();
-                    response.addProperty("id", "iceCandidate");
-                    response.add("candidate", JsonUtils.toJsonObject(event.getCandidate()));
-                    try {
-                        synchronized (session) {
-                            session.getBasicRemote().sendText(response.toString());
-                        }
-                    } catch (IOException e) {
-                        log.error(e.getMessage());
-                    }
-                }
-            });
+            webRtcEndpoint.addIceCandidateFoundListener(getListener(session));
 
             // 5. Play recorded stream
             player.play();
@@ -278,12 +227,28 @@ public class RecorderWebSocket extends BaseWebSocket {
             synchronized (session) {
                 session.getBasicRemote().sendText(response.toString());
             }
-
+            System.out.println(System.currentTimeMillis() + "=====================");
             webRtcEndpoint.gatherCandidates();
+            System.out.println(System.currentTimeMillis() + "+++++++++++++++++++++");
         } catch (Throwable t) {
             log.error("Play error", t);
             sendError(session, t.getMessage());
         }
+    }
+
+    private EventListener<IceCandidateFoundEvent> getListener(Session session) {
+        return event -> {
+            JsonObject response = new JsonObject();
+            response.addProperty("id", "iceCandidate");
+            response.add("candidate", JsonUtils.toJsonObject(event.getCandidate()));
+            try {
+                synchronized (session) {
+                    session.getBasicRemote().sendText(response.toString());
+                }
+            } catch (IOException e) {
+                log.error(e.getMessage());
+            }
+        };
     }
 
     private void sendPlayEnd(Session session, MediaPipeline pipeline) {

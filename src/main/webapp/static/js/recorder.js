@@ -75,7 +75,7 @@ function setState(nextState) {
 
 ws.onmessage = function(message) {
     var parsedMessage = JSON.parse(message.data);
-    console.info('Received message: ' + message.data);
+    console.info('Received message: ' + message.data + (new Date()).valueOf());
 
     switch (parsedMessage.id) {
         case 'startResponse':
