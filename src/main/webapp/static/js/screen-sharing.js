@@ -17,10 +17,13 @@
 
 var ws = new WebSocket('wss://' + location.host + '/screen-sharing-websocket');
 var video;
-var webRtcPeer;
+var webcam;
+var screenPeer;
+var webcamPeer;
 
 window.onload = function () {
     console = new Console();
+    webcam = document.getElementById('webcam');
     video = document.getElementById('video');
     disableStopButton();
 };
@@ -34,14 +37,26 @@ ws.onmessage = function (message) {
     console.info('Received message: ' + message.data);
 
     switch (parsedMessage.id) {
-        case 'presenterResponse':
-            presenterResponse(parsedMessage);
+        case 'screenPresenterResponse':
+            presenterResponse(parsedMessage, screenPeer);
             break;
-        case 'viewerResponse':
-            viewerResponse(parsedMessage);
+        case 'webcamPresenterResponse':
+            presenterResponse(parsedMessage, webcamPeer);
             break;
-        case 'iceCandidate':
-            webRtcPeer.addIceCandidate(parsedMessage.candidate, function (error) {
+        case 'screenViewerResponse':
+            viewerResponse(parsedMessage, screenPeer);
+            break;
+        case 'webcamViewerResponse':
+            viewerResponse(parsedMessage, webcamPeer);
+            break;
+        case 'screenIceCandidate':
+            screenPeer.addIceCandidate(parsedMessage.candidate, function (error) {
+                if (error)
+                    return console.error('Error adding candidate: ' + error);
+            });
+            break;
+        case 'webcamIceCandidate':
+            webcamPeer.addIceCandidate(parsedMessage.candidate, function (error) {
                 if (error)
                     return console.error('Error adding candidate: ' + error);
             });
@@ -54,26 +69,26 @@ ws.onmessage = function (message) {
     }
 };
 
-function presenterResponse(message) {
+function presenterResponse(message, peer) {
     if (message.response !== 'accepted') {
         var errorMsg = message.message ? message.message : 'Unknow error';
         console.info('Call not accepted for the following reason: ' + errorMsg);
         dispose();
     } else {
-        webRtcPeer.processAnswer(message.sdpAnswer, function (error) {
+        peer.processAnswer(message.sdpAnswer, function (error) {
             if (error)
                 return console.error(error);
         });
     }
 }
 
-function viewerResponse(message) {
+function viewerResponse(message, peer) {
     if (message.response !== 'accepted') {
         var errorMsg = message.message ? message.message : 'Unknow error';
         console.info('Call not accepted for the following reason: ' + errorMsg);
         dispose();
     } else {
-        webRtcPeer.processAnswer(message.sdpAnswer, function (error) {
+        peer.processAnswer(message.sdpAnswer, function (error) {
             if (error)
                 return console.error(error);
         });
@@ -81,45 +96,45 @@ function viewerResponse(message) {
 }
 
 function presenter() {
-    /*if (!webRtcPeer) {
-        showSpinner(video);
+
+    if (!screenPeer) {
+
+        showSpinner(video, webcam);
+
+        initiateScreenSharing();
 
         var options = {
-            localVideo: video,
-            sendSource: 'screen',
-            onicecandidate: onIceCandidate
+            localVideo: webcam,
+            onicecandidate: webcamOnIceCandidate
         };
-        webRtcPeer = new kurentoUtils.WebRtcPeer.WebRtcPeerSendonly(options,
+        webcamPeer = new kurentoUtils.WebRtcPeer.WebRtcPeerSendonly(options,
             function (error) {
                 if (error) {
                     return console.error(error);
                 }
-                webRtcPeer.generateOffer(onOfferPresenter);
-            });
+                webcamPeer.generateOffer(onOfferWebcamPresenter);
+            }
+        );
 
         enableStopButton();
-    }*/
-    var audioConstraints = {
-        audio: false,
-        video: true
-    };
-    navigator.getUserMedia(audioConstraints, function(stream) {
-        initiateScreenSharing(stream);
-    }, function(error) {
-        console.error("Could not get audio stream! " + error);
-    });
+    }
 }
 
-function initiateScreenSharing(audioStream){
+function initiateScreenSharing() {
     getScreenId(function (error, sourceId, screen_constraints) {
         console.log("screen_constraints: ");
+        if (!screen_constraints) {
+            hideSpinner(video, webcam);
+            disableStopButton();
+            return;
+        }
         console.log(screen_constraints);
         navigator.getUserMedia = navigator.mozGetUserMedia || navigator.webkitGetUserMedia;
         navigator.getUserMedia(screen_constraints, function (stream) {
             console.log(stream);
 
             var constraints = {
-                audio: true,
+                audio: false,
                 video: {
                     frameRate: {
                         min: 1, ideal: 15, max: 30
@@ -137,15 +152,15 @@ function initiateScreenSharing(audioStream){
                 localVideo: video,
                 videoStream: stream,
                 mediaConstraints: constraints,
-                onicecandidate: onIceCandidate,
+                onicecandidate: screenOnIceCandidate,
                 sendSource: 'screen'
             };
 
-            webRtcPeer = new kurentoUtils.WebRtcPeer.WebRtcPeerSendrecv(options, function (error) {
+            screenPeer = new kurentoUtils.WebRtcPeer.WebRtcPeerSendrecv(options, function (error) {
                 if (error) {
                     return console.error(error);
                 }
-                webRtcPeer.generateOffer(onOfferPresenter);
+                screenPeer.generateOffer(onOfferScreenPresenter);
             });
 
         }, function (error) {
@@ -154,13 +169,25 @@ function initiateScreenSharing(audioStream){
     });
 }
 
-
-function onOfferPresenter(error, offerSdp) {
+function onOfferWebcamPresenter(error, offerSdp) {
     if (error)
         return console.error('Error generating the offer');
     console.info('Invoking SDP offer callback function ' + location.host);
     var message = {
-        id: 'presenter',
+        id: 'webcam-presenter',
+        sendSource: 'screen',
+        sdpOffer: offerSdp
+    };
+    sendMessage(message);
+}
+
+
+function onOfferScreenPresenter(error, offerSdp) {
+    if (error)
+        return console.error('Error generating the offer');
+    console.info('Invoking SDP offer callback function ' + location.host);
+    var message = {
+        id: 'screen-presenter',
         sendSource: 'screen',
         sdpOffer: offerSdp
     };
@@ -168,41 +195,77 @@ function onOfferPresenter(error, offerSdp) {
 }
 
 function viewer() {
-    if (!webRtcPeer) {
-        showSpinner(video);
 
-        var options = {
-            remoteVideo: video,
-            onicecandidate: onIceCandidate
-        };
-        webRtcPeer = new kurentoUtils.WebRtcPeer.WebRtcPeerRecvonly(options,
-            function (error) {
-                if (error) {
-                    return console.error(error);
-                }
-                this.generateOffer(onOfferViewer);
-            });
+    showSpinner(video, webcam);
 
-        enableStopButton();
-    }
+    var screen_options = {
+        remoteVideo: video,
+        onicecandidate: screenOnIceCandidate
+    };
+    screenPeer = new kurentoUtils.WebRtcPeer.WebRtcPeerRecvonly(screen_options,
+        function (error) {
+            if (error) {
+                return console.error(error);
+            }
+            this.generateOffer(screenOnOfferViewer);
+        });
+
+    var webcam_options = {
+        remoteVideo: webcam,
+        onicecandidate: webcamOnIceCandidate
+    };
+    webcamPeer = new kurentoUtils.WebRtcPeer.WebRtcPeerRecvonly(webcam_options,
+        function (error) {
+            if (error) {
+                return console.error(error);
+            }
+            this.generateOffer(webcamOnOfferViewer);
+        });
+
+
+    enableStopButton();
+
 }
 
-function onOfferViewer(error, offerSdp) {
+function webcamOnOfferViewer(error, offerSdp, type) {
     if (error)
         return console.error('Error generating the offer');
     console.info('Invoking SDP offer callback function ' + location.host);
     var message = {
-        id: 'viewer',
+        id: "viewer",
+        type: "webcam",
         sdpOffer: offerSdp
     };
     sendMessage(message);
 }
 
-function onIceCandidate(candidate) {
+function screenOnOfferViewer(error, offerSdp, type) {
+    if (error)
+        return console.error('Error generating the offer');
+    console.info('Invoking SDP offer callback function ' + location.host);
+    var message = {
+        id: "viewer",
+        type: "screen",
+        sdpOffer: offerSdp
+    };
+    sendMessage(message);
+}
+
+function webcamOnIceCandidate(candidate) {
     console.log("Local candidate" + JSON.stringify(candidate));
 
     var message = {
-        id: 'onIceCandidate',
+        id: 'webcamOnIceCandidate',
+        candidate: candidate
+    };
+    sendMessage(message);
+}
+
+function screenOnIceCandidate(candidate) {
+    console.log("Local candidate" + JSON.stringify(candidate));
+
+    var message = {
+        id: 'screenOnIceCandidate',
         candidate: candidate
     };
     sendMessage(message);
@@ -217,11 +280,15 @@ function stop() {
 }
 
 function dispose() {
-    if (webRtcPeer) {
-        webRtcPeer.dispose();
-        webRtcPeer = null;
+    if (screenPeer) {
+        screenPeer.dispose();
+        screenPeer = null;
     }
-    hideSpinner(video);
+    if (webcamPeer) {
+        webcamPeer.dispose();
+        webcamPeer = null;
+    }
+    hideSpinner(video, webcam);
 
     disableStopButton();
 }
