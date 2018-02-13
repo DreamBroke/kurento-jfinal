@@ -47,6 +47,29 @@
             <version>1.1</version>
             <scope>provided</scope>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.alibaba/druid -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+            <version>1.1.6</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.45</version>
+        </dependency>
+
+        <!-- webjar kurento-utils import -->
+        <dependency>
+            <groupId>org.webjars.bower</groupId>
+            <artifactId>kurento-utils</artifactId>
+            <version>6.6.2</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>

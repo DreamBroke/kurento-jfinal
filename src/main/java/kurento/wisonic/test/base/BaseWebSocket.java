@@ -15,7 +15,7 @@ import java.io.IOException;
  */
 public abstract class BaseWebSocket {
 
-    protected KurentoClient kurento = KurentoClient.create("ws://192.168.1.180:8888/kurento");
+    protected KurentoClient kurento = KurentoClient.create("ws://52.80.176.163:8888/kurento");
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     protected static final Gson GSON = new GsonBuilder().create();
 

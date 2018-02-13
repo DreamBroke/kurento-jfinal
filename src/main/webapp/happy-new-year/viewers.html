@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'self' data: blob: 'unsafe-inline' 'unsafe-eval' ws://* wss://* ">
+
+    <link rel="shortcut icon" href="../static/img/icon.png" type="image/png"/>
+
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/ekko-lightbox/5.2.0/ekko-lightbox.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/kurento_index.css">
+    <link rel="stylesheet" href="../static/css/one2many.css">
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/fonts/fontawesome-webfont.svg">
+
+    <title>Wisonic Happy New Year</title>
+
+    <style>
+        button {
+            height: 70px;
+            width: 140px;
+        }
+
+        span {
+            font-size: 2pc;
+        }
+
+        .row {
+            margin: 0;
+        }
+
+        .video-cover {
+            position: relative;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 10;
+
+        }
+        .border-1px {
+            border: 1px solid #C2C2C2;
+        }
+
+        .video-cover img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .video-btn {
+            display: block;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate3d(-50%, -50%, 0);
+            width: 10rem;
+            height: 10rem;
+            background-image: url(../static/img/play.png);
+            background-size: 100% 100%;
+        }
+        .title {
+            margin: 20px;
+            border-radius:15px;
+            background-color: white;
+        }
+        .auto-height {
+            height: auto; width: 100%;
+        }
+        .font-size {
+            font-size: 3em;
+        }
+        .blur {
+            -webkit-filter: blur(1px); /* Chrome, Opera */
+            -moz-filter: blur(1px);
+            -ms-filter: blur(1px);
+            filter: blur(1px);
+        }
+        @media screen and (min-width: 980px)  and (max-width: 4096px) {
+            .container-fluid {
+                width: 980px !important;
+                margin: auto !important;
+            }
+        }
+    </style>
+    <script src="../static/js/console.js"></script>
+</head>
+
+<body style="background-color: rgb(240, 240, 240)">
+<div class="container-fluid" style="margin: 0; padding: 0; width: 100%">
+    <div class="row">
+        <div class="video-cover col-md-12 border-1px">
+            <img src="../static/img/background.jpg" alt class="auto-height">
+            <div class="video-btn" id="play-video"></div>
+        </div>
+        <video id="video" autoplay hidden controls playsinline="true" style="width: 100%;"></video>
+    </div>
+    <div class="row">
+        <br/> <label class="control-label" for="console">Console</label><br>
+        <br>
+        <div id="console" class="democonsole" style="font-size: 2rem; height: 500px">
+            <ul></ul>
+        </div>
+    </div>
+    <div class="row title" style="border: 2px solid #C2C2C2; ">
+        <div class="row" style="margin: 50px;">
+            <div class="col-md-3 col-sm-2" style="height: 120px">
+                <img src="../static/img/icon.png" class="auto-height">
+            </div>
+            <div class="col-md-9 col-sm-10 font-size">
+                深圳华声医疗技术股份有限公司<br>年会现场直播<br><span style="font-size: 0.75em">当前观看人数： <span id="viewer-count">-</span></span>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin: 0 20px 10px 20px">
+        <div class="col-sm-12 font-size" >
+            <b>华声介绍：</b><br>
+            <span style="font-size: 0.75em">深圳华声医疗技术股份有限公司成立于2013年3月，位于深圳南山西丽湖畔，2017年9月成功登陆新三板，是一家从事医疗设备研发、制造、营销的新兴高新技术企业，目前提供生命信息支持、数字便携彩超、移动医疗服务三个方面的业务解决方案。</span>
+        </div>
+    </div>
+    <div class="row">
+        <img src="../static/img/playbill.jpg" class="auto-height">
+    </div>
+</div>
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://cdn.bootcss.com/ekko-lightbox/5.2.0/ekko-lightbox.min.js"></script>
+<script src="https://cdn.bootcss.com/webrtc-adapter/6.1.1/adapter.min.js"></script>
+<!--<script src="../static/js/kurento-utils.js"></script>-->
+<script src="/webjars/kurento-utils/6.6.2/js/kurento-utils.js"></script>
+<!--<script src="../static/js/viewers.js"></script>-->
+<script src="../static/js/viewers-ios-test.js"></script>
+<script>
+
+</script>
+</body>
+</html>

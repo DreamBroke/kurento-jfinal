@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="shortcut icon" href="../static/img/kurento.png" type="image/png"/>
+
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/ekko-lightbox/5.2.0/ekko-lightbox.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/kurento_index.css">
+    <link rel="stylesheet" href="../static/css/one2many.css">
+
+    <title>Broadcast and Record</title>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-5">
+            <h3>Local stream</h3>
+            <br>
+            <table class="table table-condensed">
+                <tr>
+                    <th>Stat</th>
+                    <th>Browser</th>
+                    <th>KMS</th>
+                </tr>
+                <tr>
+                    <td>SSRC</td>
+                    <td id="browserOutgoingSsrc">--</td>
+                    <td id="kmsIncomingSsrc">--</td>
+                </tr>
+                <tr>
+                    <td>Bytes send (browser)</td>
+                    <td id="browserBytesSent">--</td>
+                    <td id="kmsBytesReceived">--</td>
+                </tr>
+                <tr>
+                    <td>Packets send (browser)</td>
+                    <td id="browserPacketsSent">--</td>
+                    <td id="kmsPacketsReceived">--</td>
+                </tr>
+                <tr>
+                    <td>PLIs received (browser)</td>
+                    <td id="browserPliReceived">--</td>
+                    <td id="kmsPliSent">--</td>
+                </tr>
+                <tr>
+                    <td>FIRs received (browser)</td>
+                    <td id="browserFirReceived">--</td>
+                    <td id="kmsFirSent">--</td>
+                </tr>
+                <tr>
+                    <td>NACKs received (browser)</td>
+                    <td id="browserNackReceived">--</td>
+                    <td id="kmsNackSent">--</td>
+                </tr>
+                <tr>
+                    <td>RTT</td>
+                    <td id="browserRtt">--</td>
+                    <td>--</td>
+                </tr>
+                <tr>
+                    <td>Jitter</td>
+                    <td>--</td>
+                    <td id="kmsJitter">--</td>
+                </tr>
+                <tr>
+                    <td>Packets Lost</td>
+                    <td id="browserOutboundPacketsLost">--</td>
+                    <td id="kmsPacketsLost">--</td>
+                </tr>
+                <tr>
+                    <td>Fraction lost</td>
+                    <td id="browserFractionLost">--</td>
+                    <td id="kmsFractionLost">--</td>
+                </tr>
+                <tr>
+                    <td>REMB</td>
+                    <td id="browserRembReceived">--</td>
+                    <td id="kmsRembSend">--</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="col-md-5">
+            <h3>Remote stream</h3>
+            <br>
+            <table class="table table-condensed">
+                <tr>
+                    <th>Stat</th>
+                    <th>Browser</th>
+                    <th>KMS</th>
+                </tr>
+                <tr>
+                    <td>SSRC</td>
+                    <td id="browserIncomingSsrc">--</td>
+                    <td id="kmsOutogingSsrc">--</td>
+                </tr>
+                <tr>
+                    <td>Bytes received (browser)</td>
+                    <td id="browserBytesReceived">--</td>
+                    <td id="kmsBytesSent">--</td>
+                </tr>
+                <tr>
+                    <td>Packets received (browser)</td>
+                    <td id="browserPacketsReceived">--</td>
+                    <td id="kmsPacketsSent">--</td>
+                </tr>
+                <tr>
+                    <td>PLIs sent (browser)</td>
+                    <td id="browserPliSent">--</td>
+                    <td id="kmsPliReceived">--</td>
+                </tr>
+                <tr>
+                    <td>FIRs sent (browser)</td>
+                    <td id="browserFirSent">--</td>
+                    <td id="kmsFirReceived">--</td>
+                </tr>
+                <tr>
+                    <td>NACKs sent (browser)</td>
+                    <td id="browserNackSent">--</td>
+                    <td id="kmsNackReceived">--</td>
+                </tr>
+                <tr>
+                    <td>Jitter</td>
+                    <td id="browserJitter">--</td>
+                    <td>--</td>
+                </tr>
+                <tr>
+                    <td>RTT</td>
+                    <td>--</td>
+                    <td id="kmsRtt">--</td>
+                </tr>
+                <tr>
+                    <td>Packet lost (browser)</td>
+                    <td id="browserIncomingPacketLost">--</td>
+                    <td>--</td>
+                </tr>
+                <tr>
+                    <td>REMB</td>
+                    <td id="browserRembReceived1">--</td>
+                    <td id="kmsRembReceived">--</td>
+                </tr>
+
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-5">
+            <div class="row">
+                <div class="col-md-12">
+                    <a id="presenter" href="#" class="btn btn-success"><span class="glyphicon glyphicon-play"></span>Presenter </a>
+                    <a id="viewer" href="#" class="btn btn-primary"><span class="glyphicon glyphicon-user"></span>Viewer</a>
+                    <a id="stop" href="#" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span> Stop</a>
+                </div>
+            </div>
+            <br/> <label class="control-label" for="console">Console</label><br>
+            <br>
+            <div id="console" class="democonsole">
+                <ul></ul>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div id="videoBig">
+                <video id="video" autoplay width="1280px" height="760px" poster="../static/img/webrtc.png"></video>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="../static/3rdpart/jquery/jquery.min.js"></script>
+<script>if (typeof module === 'object') {window.jQuery = window.$ = module.exports;}</script>
+
+
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://cdn.bootcss.com/ekko-lightbox/5.2.0/ekko-lightbox.min.js"></script>
+<script src="https://cdn.bootcss.com/webrtc-adapter/6.0.3/adapter.js"></script>
+<script src="../static/js/console.js"></script>
+
+<script src="../static/js/kurento-utils.js"></script>
+<!--<script src="../static/js/getScreenId.js"></script>-->
+<script src="../static/js/broadcast-http.js"></script>
+</body>
+</html>

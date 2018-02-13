@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="shortcut icon" href="../static/img/kurento.png" type="image/png"/>
+
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/ekko-lightbox/5.2.0/ekko-lightbox.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/kurento_index.css">
+    <link rel="stylesheet" href="../static/css/one2many.css">
+
+    <title>Broadcast and Record</title>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-5">
+            <div class="row">
+                <div class="col-md-12">
+                    <a id="presenter" href="#" class="btn btn-success"><span class="glyphicon glyphicon-play"></span>Presenter </a>
+                    <a id="viewer" href="#" class="btn btn-primary"><span class="glyphicon glyphicon-user"></span>Viewer</a>
+                    <a id="stop" href="#" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span> Stop</a>
+                </div>
+                <div class="col-md-8" style="margin-top: 10px">
+                    <input type="text" placeholder="请输入sessionId" id="sessionId" class="form-control">
+                </div>
+            </div>
+
+            <br/> <label class="control-label" for="console">Console</label><br>
+            <br>
+            <div id="console" class="democonsole">
+                <ul></ul>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div id="videoBig">
+                <video id="video" autoplay width="1280px" height="760px" poster="../static/img/webrtc.png"></video>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="../static/3rdpart/jquery/jquery.min.js"></script>
+<script>if (typeof module === 'object') {window.jQuery = window.$ = module.exports;}</script>
+
+
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://cdn.bootcss.com/ekko-lightbox/5.2.0/ekko-lightbox.min.js"></script>
+<script src="https://cdn.bootcss.com/webrtc-adapter/6.0.3/adapter.js"></script>
+<script src="../static/js/console.js"></script>
+
+<script src="../static/js/kurento-utils.js"></script>
+<script src="../static/js/getScreenId.js"></script>
+<script src="../static/js/broadcast.js"></script>
+</body>
+</html>

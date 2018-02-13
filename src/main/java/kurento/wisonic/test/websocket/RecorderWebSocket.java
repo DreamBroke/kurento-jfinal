@@ -189,7 +189,6 @@ public class RecorderWebSocket extends BaseWebSocket {
 
     private void play(UserSessionRecorder user, final Session session, JsonObject jsonMessage) {
         try {
-
             // 1. Media logic
             final MediaPipeline pipeline = kurento.createMediaPipeline();
             WebRtcEndpoint webRtcEndpoint = new WebRtcEndpoint.Builder(pipeline).build();
